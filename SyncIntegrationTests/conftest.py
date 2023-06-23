@@ -48,9 +48,8 @@ def tps_addon(pytestconfig, tmpdir_factory):
     task_url = 'https://firefox-ci-tc.services.mozilla.com/api/index/v1/task/' \
                'gecko.v2.mozilla-central.latest.firefox.addons.tps'
     task_id = requests.get(task_url).json().get('taskId')
-    cache_dir = str(pytestconfig.cache.makedir('tps-{}'.format(task_id)))
-    addon_url = 'https://firefox-ci-tc.services.mozilla.com/api/queue/v1/task/' \
-                '{}/artifacts/public/tps.xpi'.format(task_id)
+    cache_dir = str(pytestconfig.cache.makedir(f'tps-{task_id}'))
+    addon_url = f'https://firefox-ci-tc.services.mozilla.com/api/queue/v1/task/{task_id}/artifacts/public/tps.xpi'
     scraper = DirectScraper(addon_url, destination=cache_dir)
     return scraper.download()
 
@@ -152,13 +151,13 @@ def pytest_runtest_makereport(item, call):
                 if pytest_html is not None:
                     with io.open(path, 'r', encoding='utf8') as f:
                         extra.append(pytest_html.extras.text(f.read(), 'Sync'))
-                report.sections.append(('Sync', 'Log: {}'.format(path)))
+                report.sections.append(('Sync', f'Log: {path}'))
     for log in ('Firefox', 'TPS', 'XCodeBuild'):
-        attr = '_{}_log'.format(log.lower())
+        attr = f'_{log.lower()}_log'
         path = getattr(item.config, attr, None)
         if path is not None and os.path.exists(path):
             if pytest_html is not None:
                 with io.open(path, 'r', encoding='utf8') as f:
                     extra.append(pytest_html.extras.text(f.read(), log))
-            report.sections.append((log, 'Log: {}'.format(path)))
+            report.sections.append((log, f'Log: {path}'))
     report.extra = extra

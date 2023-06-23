@@ -24,11 +24,15 @@ class XCodeBuild(object):
         args = [
             self.binary,
             'test',
-            '-scheme', self.scheme,
-            '-destination', self.destination,
-            '-only-testing:{}'.format(identifier),
-            '-testPlan', self.testPlan]
-        self.logger.info('Running: {}'.format(' '.join(args)))
+            '-scheme',
+            self.scheme,
+            '-destination',
+            self.destination,
+            f'-only-testing:{identifier}',
+            '-testPlan',
+            self.testPlan,
+        ]
+        self.logger.info(f"Running: {' '.join(args)}")
         try:
             out = subprocess.check_output(
                 args,

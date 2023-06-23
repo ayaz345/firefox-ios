@@ -29,8 +29,8 @@ class TPS(object):
         })
         args = ['-marionette']
         process_args = {'processOutputLine': [self._log]}
-        self.logger.info('Running: {} {}'.format(self.firefox, ' '.join(args)))
-        self.logger.info('Using profile at: {}'.format(self.profile.profile))
+        self.logger.info(f"Running: {self.firefox} {' '.join(args)}")
+        self.logger.info(f'Using profile at: {self.profile.profile}')
         runner = FirefoxRunner(
             binary=self.firefox,
             cmdargs=args,
@@ -41,12 +41,12 @@ class TPS(object):
         self.firefox_log.close()
 
         with open(self.tps_log) as f:
-            for line in f.readlines():
+            for line in f:
                 if 'CROSSWEAVE ERROR: ' in line:
                     raise TPSError(line.partition('CROSSWEAVE ERROR: ')[-1])
 
         with open(self.tps_log) as f:
-            assert 'test phase {}: PASS'.format(phase) in f.read()
+            assert f'test phase {phase}: PASS' in f.read()
 
 
 class TPSError(Exception):

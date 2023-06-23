@@ -8,15 +8,10 @@ PERFHERDER_DATA = {"framework": {"name":"mozperftest"},
 with open('test.json') as json_file:
     data = json.load(json_file)
     for p in data:
-        suite = {}
-        suite["name"] = p["testName"]
-        suite["subtests"] = []
+        suite = {"name": p["testName"], "subtests": []}
         for key, value in p.items():
             if key != "testName":
-                subtest = {}
-                subtest["name"] = key
-                subtest["replicates"] = [value]
-                subtest["value"] = float(value)
+                subtest = {"name": key, "replicates": [value], "value": float(value)}
                 suite["subtests"].append(subtest)
         PERFHERDER_DATA["suites"].append(suite)
 

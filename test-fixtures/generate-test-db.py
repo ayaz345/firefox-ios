@@ -64,13 +64,12 @@ def get_device_id():
     """
     result = subprocess.run(['xcrun', 'simctl', 'list', 'devices'], capture_output=True, text=True)
     lines = result.stdout.splitlines()
-    
+
     device_id = None
     for line in lines:
         if '(Booted)' in line:
-            match = re.search(r'\((.*?)\)', line)
-            if match:
-                device_id = match.group(1)
+            if match := re.search(r'\((.*?)\)', line):
+                device_id = match[1]
                 break
     if not device_id:
         raise Exception('No booted simulator found! Please launch an iOS Simulator device and try again.')
@@ -84,12 +83,10 @@ def get_app_group_id(bundle_id):
     result = subprocess.run(app_group_command, capture_output=True, text=True)
     app_group_container_path = result.stdout.strip()
 
-    # Extract the app_group_id from the returned path
-    app_group_id = os.path.basename(app_group_container_path)
-    if not app_group_id:
+    if app_group_id := os.path.basename(app_group_container_path):
+        return app_group_id
+    else:
         raise Exception(f'Could not find app group ID for bundle ID {bundle_id}. Please verify you have the app installed and try again.')
-    
-    return app_group_id
 
 # GUID is a required field for each record and needs to be created
 def generate_guid():

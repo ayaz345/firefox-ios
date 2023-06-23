@@ -10,7 +10,7 @@ class XCRun(object):
 
     def _run(self, *args):
         args = [self.binary, 'simctl'] + list(args)
-        self.logger.info('Running: {}'.format(' '.join(args)))
+        self.logger.info(f"Running: {' '.join(args)}")
         subprocess.check_call(args)
 
     def shutdown(self, device='all'):

@@ -34,11 +34,10 @@ resp_json = resp.json()
 
 def parse_semver(raw_str):
     parsed = raw_str.split(pattern)[1]
-    if parsed[-1] == 'x':
-        p = parsed.split('.x')[0]
-        return '{0}.0'.format(p)
-    else:
+    if parsed[-1] != 'x':
         return False
+    p = parsed.split('.x')[0]
+    return '{0}.0'.format(p)
 
 
 def available_stacks():
@@ -58,8 +57,8 @@ def largest_version():
         # only look at XCode versions that aren't in beta
         if stacks[item]['beta-tag'] != '': continue
         # use the first version in the list that matches both platform and version
-        if all([x in item for x in patterns]): 
-            return '{0}.x'.format('.'.join(item.split('.')[0:2]))
+        if all(x in item for x in patterns): 
+            return '{0}.x'.format('.'.join(item.split('.')[:2]))
 
 if __name__ == '__main__':
     '''

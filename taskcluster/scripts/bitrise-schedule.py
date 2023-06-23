@@ -17,7 +17,9 @@ from aiohttp_retry import RetryClient
 log = logging.getLogger(__name__)
 
 BITRISE_APP_SLUG_ID = "6c06d3a40422d10f"
-BITRISE_URL_TEMPLATE = "https://api.bitrise.io/v0.1/apps/" + BITRISE_APP_SLUG_ID + "/{suffix}"
+BITRISE_URL_TEMPLATE = (
+    f"https://api.bitrise.io/v0.1/apps/{BITRISE_APP_SLUG_ID}" + "/{suffix}"
+)
 
 
 class TaskException(Exception):
@@ -104,11 +106,7 @@ async def async_main(token, branch, commit, workflow, artifacts_directory, local
 async def schedule_build(client, branch, commit, workflow, locales=None, derived_data_path=None):
     url = BITRISE_URL_TEMPLATE.format(suffix="builds")
 
-    if locales:
-        moz_locales_value = " ".join(locales)
-    else:
-        moz_locales_value = "en-US"
-
+    moz_locales_value = " ".join(locales) if locales else "en-US"
     environment_variables = [{
         "mapped_to": environment_variable_name,
         "value": environment_variable_value,
@@ -190,8 +188,7 @@ async def download_log(client, build_slug, artifacts_directory):
             log.info("Log is still running. Waiting another minute...")
             await asyncio.sleep(60)
 
-    download_url = response["expiring_raw_log_url"]
-    if download_url:
+    if download_url := response["expiring_raw_log_url"]:
         await download_file(download_url, os.path.join(artifacts_directory, "bitrise.log"))
     else:
         log.error("Bitrise has no log to offer for job {0}. Please check https://app.bitrise.io/build/{0}".format(build_slug))

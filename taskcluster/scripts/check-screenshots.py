@@ -69,9 +69,7 @@ def _check_files(artifacts_directory, locales, number_of_screenshots_per_locale)
     expected_archives = set(expected_number_of_screenshots_per_archive.keys())
     if archives != expected_archives:
         errors.append(
-            "The list of archives (zip files) does not match the expected one. Expected: {}. Got: {}.".format(
-                expected_archives, archives
-            )
+            f"The list of archives (zip files) does not match the expected one. Expected: {expected_archives}. Got: {archives}."
         )
 
     log.info(f"Processing {len(expected_archives)} archives...")
@@ -107,16 +105,13 @@ def _check_single_archive(archive, expected_number_of_screenshots):
     with ZipFile(archive) as zip_file:
         all_files = set(zip_file.namelist())
         png_files = {file for file in all_files if file.endswith(".png")}
-        non_png_files = all_files - png_files
-        if non_png_files:
+        if non_png_files := all_files - png_files:
             errors.append(f'Archive "{archive}" contains non-png files: {non_png_files}')
 
         actual_number_of_screenshots = len(png_files)
         if actual_number_of_screenshots != expected_number_of_screenshots:
             errors.append(
-                'Archive "{}" does not contain the expected number of screenshots. Expected: {}. Got: {}'.format(
-                    archive, expected_number_of_screenshots, actual_number_of_screenshots
-                )
+                f'Archive "{archive}" does not contain the expected number of screenshots. Expected: {expected_number_of_screenshots}. Got: {actual_number_of_screenshots}'
             )
 
     return errors

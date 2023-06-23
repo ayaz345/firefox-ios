@@ -49,7 +49,7 @@ def main():
     supportedLocales = getSupportedLocales()
     for locale in locales:
         if (locale not in supportedLocales):
-            print("skipping unsupported locale: %s" % locale)
+            print(f"skipping unsupported locale: {locale}")
             continue
 
         downloadLocale(locale, L10nScraper(locale))
@@ -57,10 +57,10 @@ def main():
     verifyEngines()
 
 def downloadLocale(locale, scraper):
-    print("scraping: %s..." % locale)
+    print(f"scraping: {locale}...")
     files = scraper.getFileList()
     if files is None:
-        print("no files for locale: %s" % locale)
+        print(f"no files for locale: {locale}")
         return
 
     print("  found search plugins")
@@ -71,20 +71,19 @@ def downloadLocale(locale, scraper):
 
     # Get the default search engine for this locale.
     default = scraper.getDefault()
-    print("  default: %s" % default)
+    print(f"  default: {default}")
     saveDefault(locale, default)
 
     for file in files:
         path = os.path.join(directory, file)
-        print("  downloading: %s..." % file)
+        print(f"  downloading: {file}...")
         downloadedFile = scraper.getFile(file)
         name, extension = os.path.splitext(file)
 
         # Apply iOS-specific overlays for this engine if they are defined.
         if extension == ".xml":
             engine = name.split("-")[0]
-            overlay = overlayForEngine(engine)
-            if overlay:
+            if overlay := overlayForEngine(engine):
                 plugin = etree.parse(downloadedFile)
                 overlay.apply(plugin)
                 contents = MOZ_HEADER + etree.tostring(plugin.getroot(), encoding="utf-8", pretty_print=True)
@@ -106,20 +105,18 @@ def verifyEngines():
 
         for engine in engineList:
             if engine.endswith(":hidden"): continue
-            path = os.path.join(localeDir, engine + ".xml")
-            enPath = os.path.join(enDir, engine + ".xml")
+            path = os.path.join(localeDir, f"{engine}.xml")
+            enPath = os.path.join(enDir, f"{engine}.xml")
             if not os.path.exists(path) and not os.path.exists(enPath):
-                print("  ERROR: missing engine %s for locale %s" % (engine, locale))
+                print(f"  ERROR: missing engine {engine} for locale {locale}")
 
 def getSupportedLocales():
     supportedLocales = subprocess.Popen("./get_supported_locales.swift", stdout=subprocess.PIPE).communicate()[0]
     return json.loads(supportedLocales.replace("_", "-"))
 
 def overlayForEngine(engine):
-    path = os.path.join("SearchOverlays", "%s.xml" % engine)
-    if not os.path.exists(path):
-        return None
-    return Overlay(path)
+    path = os.path.join("SearchOverlays", f"{engine}.xml")
+    return None if not os.path.exists(path) else Overlay(path)
 
 def saveDefault(locale, default):
     directory = os.path.join("SearchPlugins", locale, "default.txt")
@@ -154,9 +151,7 @@ class Scraper:
         for line in lines:
             values = line.strip().split("=")
             if len(values) == 2 and values[0].strip() == self.defaultPrefName:
-                default = values[1].strip()
-                return default
-
+                return values[1].strip()
         raise Exception("error: no default pref found")
 
 

@@ -14,7 +14,9 @@ import taskcluster
 
 
 def write_secret_to_file(path, data, key, base64decode=False, json_secret=False, append=False, prefix=''):
-    path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../' + path))
+    path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), f'../../{path}')
+    )
     try:
         os.makedirs(os.path.dirname(path))
     except OSError as error:
